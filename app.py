@@ -53,8 +53,20 @@ def process_video():
 
     capture.release()
 
+    job_id = "move_001"
+
+    output_path = f"outputs/{job_id}.json"
+
+    with open(output_path, "w") as file:
+        import json
+        json.dump({
+            "jobId": job_id,
+            "frames": frames
+        }, file)
+
     return jsonify({
-        "frames": frames
+        "success": True,
+        "jobId": job_id
     })
 
 
