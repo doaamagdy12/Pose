@@ -1,0 +1,11 @@
+# Video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# OpenPose outputs
+outputs/
+
+# Temporary files
+temp_*
