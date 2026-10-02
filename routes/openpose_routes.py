@@ -13,6 +13,8 @@ from validators.move_validator import (
     validate_video
 )
 
+from services.movement_service import analyze_keypoint
+
 openpose_bp = Blueprint("openpose", __name__)
 
 
@@ -99,4 +101,41 @@ def update_move(job_id):
         "success": True,
         "jobId": job_id,
         "name": result["name"]
+    })
+
+
+@openpose_bp.route("/openpose/movement/<job_id>", methods=["GET"])
+def analyze_movement(job_id):
+
+    # Get the saved OpenPose result
+    result = get_result(job_id)
+
+    if result is None:
+        return jsonify({
+            "success": False,
+            "message": "Job not found"
+        }), 404
+
+    # Get the requested keypoint index
+    keypoint_index = request.args.get("keypoint", type=int)
+
+    if keypoint_index is None:
+        return jsonify({
+            "success": False,
+            "message": "Keypoint index is required"
+        }), 400
+
+    # Calculate movement between consecutive frames
+    movements = analyze_keypoint(
+        result["frames"],
+        keypoint_index,
+        result["fps"]
+    )
+
+    return jsonify({
+        "success": True,
+        "jobId": job_id,
+        "name": result["name"],
+        "keypoint": keypoint_index,
+        "movements": movements
     })
